@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ComponentStore } from '@ngrx/component-store';
+import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { switchMap, tap } from 'rxjs/operators';
 
 import { WarrantyInfo, WarrantyService } from '../services/warranty.service';
@@ -34,8 +34,8 @@ export class WarrantyStore extends ComponentStore<WarrantyState> {
     this.getWarrantyInfo();
   }
 
-  public readonly getWarrantyInfo = this.effect((input) => {
-    return input.pipe(
+  public readonly getWarrantyInfo = this.effect((trigger$) => {
+    return trigger$.pipe(
       tap(() =>
         this.updateWarranyInfo({
           ...initialState.warrantyInfo,
@@ -45,12 +45,13 @@ export class WarrantyStore extends ComponentStore<WarrantyState> {
       switchMap(() =>
         this.warrantyService.getWarrantyInfo().pipe(
           tap((info) => console.log(`Receive info: ${JSON.stringify(info)}`)),
-          tap({
-            next: (info: WarrantyInfo) => this.updateWarranyInfo(info),
-            error: (err) => console.error('Error while retrieving info:', err),
-          })
+          tapResponse(
+            (info: WarrantyInfo) => this.updateWarranyInfo(info),
+            (err) => console.error('Error while retrieving info:', err)
+          )
         )
       )
     );
   });
 }
+
