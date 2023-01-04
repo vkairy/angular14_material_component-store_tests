@@ -1,0 +1,23 @@
+<mat-card *ngIf="warrantyInfo$ | async as state">
+  <mat-card-header>
+    <mat-card-title>Warranty Information</mat-card-title>
+  </mat-card-header>
+  <div *ngIf="state.status !== 'Fetching Info'; else loading">
+    <mat-card-content>
+      <p>Status: {{ state.status }}</p>
+      <p *ngIf="state.endDate">
+        End date: {{ state.endDate | date: 'mediumDate' }}
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="fetchWarrantyInfo()">
+        Update
+      </button>
+    </mat-card-actions>
+  </div>
+  <ng-template #loading>
+    <mat-card-content>
+      <mat-spinner color="accent"></mat-spinner>
+    </mat-card-content>
+  </ng-template>
+</mat-card>
